@@ -178,7 +178,7 @@ class Route
      */
     public function withGravParam($param, $value)
     {
-        return $this->withParam('gravParams', $param, null !== $value ? (string)$value : null);
+        return $this->withParam('gravParams', $param, $value);
     }
 
     /**
@@ -222,16 +222,17 @@ class Route
     protected function withParam($type, $param, $value)
     {
         $oldValue = isset($this->{$type}[$param]) ? $this->{$type}[$param] : null;
+        $newValue = null !== $value ? (string)$value : null;
 
-        if ($oldValue === $value) {
+        if ($oldValue === $newValue) {
             return $this;
         }
 
         $new = clone $this;
-        if ($value === null) {
+        if ($newValue === null) {
             unset($new->{$type}[$param]);
         } else {
-            $new->{$type}[$param] = $value;
+            $new->{$type}[$param] = $newValue;
         }
 
         return $new;

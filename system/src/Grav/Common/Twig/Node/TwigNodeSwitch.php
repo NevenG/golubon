@@ -10,13 +10,7 @@ namespace Grav\Common\Twig\Node;
 
 class TwigNodeSwitch extends \Twig_Node implements \Twig_NodeOutputInterface
 {
-    public function __construct(
-        \Twig_Node $value,
-        \Twig_Node $cases,
-        \Twig_Node $default = null,
-        $lineno = 0,
-        $tag = null
-    )
+    public function __construct(\Twig_NodeInterface $value, \Twig_NodeInterface $cases, \Twig_NodeInterface $default = null, $lineno, $tag = null)
     {
         parent::__construct(array('value' => $value, 'cases' => $cases, 'default' => $default), array(), $lineno, $tag);
     }
@@ -30,17 +24,20 @@ class TwigNodeSwitch extends \Twig_Node implements \Twig_NodeOutputInterface
     {
         $compiler
             ->addDebugInfo($this)
-            ->write('switch (')
+            ->write("switch (")
             ->subcompile($this->getNode('value'))
             ->raw(") {\n")
             ->indent();
 
-        foreach ($this->getNode('cases') as $case) {
-            if (!$case->hasNode('body')) {
+        foreach ($this->getNode('cases') as $case)
+        {
+            if (!$case->hasNode('body'))
+            {
                 continue;
             }
 
-            foreach ($case->getNode('values') as $value) {
+            foreach ($case->getNode('values') as $value)
+            {
                 $compiler
                     ->write('case ')
                     ->subcompile($value)
@@ -56,7 +53,8 @@ class TwigNodeSwitch extends \Twig_Node implements \Twig_NodeOutputInterface
                 ->write("}\n");
         }
 
-        if ($this->hasNode('default') && $this->getNode('default') !== null) {
+        if ($this->hasNode('default') && $this->getNode('default') !== null)
+        {
             $compiler
                 ->write("default:\n")
                 ->write("{\n")

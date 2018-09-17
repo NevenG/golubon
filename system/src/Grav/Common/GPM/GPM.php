@@ -13,7 +13,7 @@ use Grav\Common\Filesystem\Folder;
 use Grav\Common\Inflector;
 use Grav\Common\Iterator;
 use Grav\Common\Utils;
-use RocketTheme\Toolbox\File\YamlFile;
+use Symfony\Component\Yaml\Yaml;
 
 class GPM extends Iterator
 {
@@ -624,10 +624,7 @@ class GPM extends Iterator
             return false;
         }
 
-        $file = YamlFile::instance($blueprint_file);
-        $blueprint = (array)$file->content();
-        $file->free();
-
+        $blueprint = (array)Yaml::parse(file_get_contents($blueprint_file));
         return $blueprint;
     }
 
@@ -876,9 +873,7 @@ class GPM extends Iterator
                 // get currently installed version
                 $locator = Grav::instance()['locator'];
                 $blueprints_path = $locator->findResource('plugins://' . $dependency_slug . DS . 'blueprints.yaml');
-                $file = YamlFile::instance($blueprints_path);
-                $package_yaml = $file->content();
-                $file->free();
+                $package_yaml = Yaml::parse(file_get_contents($blueprints_path));
                 $currentlyInstalledVersion = $package_yaml['version'];
 
                 // if requirement is next significant release, check is compatible with currently installed version, might not be

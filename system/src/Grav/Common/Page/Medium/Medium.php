@@ -12,9 +12,9 @@ use Grav\Common\File\CompiledYamlFile;
 use Grav\Common\Grav;
 use Grav\Common\Data\Data;
 use Grav\Common\Data\Blueprint;
-use Grav\Common\Media\Interfaces\MediaObjectInterface;
+use Grav\Common\Utils;
 
-class Medium extends Data implements RenderableInterface, MediaObjectInterface
+class Medium extends Data implements RenderableInterface
 {
     use ParsedownHtmlTrait;
 
@@ -199,12 +199,7 @@ class Medium extends Data implements RenderableInterface, MediaObjectInterface
      */
     public function url($reset = true)
     {
-        $output = preg_replace('|^' . preg_quote(GRAV_ROOT, '|') . '|', '', $this->get('filepath'));
-
-        $locator = Grav::instance()['locator'];
-        if ($locator->isStream($output)) {
-            $output = $locator->findResource($output, false);
-        }
+        $output = preg_replace('|^' . preg_quote(GRAV_ROOT) . '|', '', $this->get('filepath'));
 
         if ($reset) {
             $this->reset();

@@ -8,14 +8,13 @@
 
 namespace Grav\Framework\Object\Interfaces;
 
-use Doctrine\Common\Collections\Selectable;
 use Grav\Framework\Collection\CollectionInterface;
 
 /**
  * ObjectCollection Interface
  * @package Grav\Framework\Collection
  */
-interface ObjectCollectionInterface extends CollectionInterface, Selectable, ObjectInterface
+interface ObjectCollectionInterface extends CollectionInterface, ObjectInterface
 {
     /**
      * Create a copy from this collection by cloning all objects in the collection.

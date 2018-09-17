@@ -8,18 +8,34 @@
 
 namespace Grav\Common;
 
-class Session extends \Grav\Framework\Session\Session
+use RocketTheme\Toolbox\Session\Session as BaseSession;
+
+class Session extends BaseSession
 {
     /** @var bool */
     protected $autoStart = false;
 
+    protected $lifetime;
+    protected $path;
+    protected $domain;
+    protected $secure;
+    protected $httpOnly;
+
     /**
-     * @return \Grav\Framework\Session\Session
-     * @deprecated 1.5
+     * @param int    $lifetime Defaults to 1800 seconds.
+     * @param string $path     Cookie path.
+     * @param string $domain   Optional, domain for the session
+     * @throws \RuntimeException
      */
-    public static function instance()
+    public function __construct($lifetime, $path, $domain = null)
     {
-        return static::getInstance();
+        $this->lifetime = $lifetime;
+        $this->path = $path;
+        $this->domain = $domain;
+
+        if (php_sapi_name() !== 'cli') {
+            parent::__construct($lifetime, $path, $domain);
+        }
     }
 
     /**
@@ -31,6 +47,9 @@ class Session extends \Grav\Framework\Session\Session
     {
         if ($this->autoStart) {
             $this->start();
+
+            // TODO: This setcookie shouldn't be here, session should by itself be able to update its cookie.
+            setcookie(session_name(), session_id(), $this->lifetime ? time() + $this->lifetime : 0, $this->path, $this->domain, $this->secure, $this->httpOnly);
 
             $this->autoStart = false;
         }
@@ -48,25 +67,27 @@ class Session extends \Grav\Framework\Session\Session
     }
 
     /**
-     * Returns attributes.
-     *
-     * @return array Attributes
-     * @deprecated 1.5
+     * @param bool $secure
+     * @return $this
      */
-    public function all()
+    public function setSecure($secure)
     {
-        return $this->getAll();
+        $this->secure = $secure;
+        ini_set('session.cookie_secure', (bool)$secure);
+
+        return $this;
     }
 
     /**
-     * Checks if the session was started.
-     *
-     * @return Boolean
-     * @deprecated 1.5
+     * @param bool $httpOnly
+     * @return $this
      */
-    public function started()
+    public function setHttpOnly($httpOnly)
     {
-        return $this->isStarted();
+        $this->httpOnly = $httpOnly;
+        ini_set('session.cookie_httponly', (bool)$httpOnly);
+
+        return $this;
     }
 
     /**

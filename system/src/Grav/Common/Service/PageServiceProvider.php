@@ -8,7 +8,6 @@
 
 namespace Grav\Common\Service;
 
-use Grav\Common\Config\Config;
 use Grav\Common\Grav;
 use Grav\Common\Language\Language;
 use Grav\Common\Page\Page;
@@ -27,33 +26,35 @@ class PageServiceProvider implements ServiceProviderInterface
             /** @var Pages $pages */
             $pages = $c['pages'];
 
-            /** @var Config $config */
-            $config = $c['config'];
-
             /** @var Uri $uri */
             $uri = $c['uri'];
 
-            $path = $uri->path() ?: '/'; // Don't trim to support trailing slash default routes
+            $path = $uri->path(); // Don't trim to support trailing slash default routes
+            $path = $path ?: '/';
+
             $page = $pages->dispatch($path);
 
             // Redirection tests
             if ($page) {
+                /** @var Language $language */
+                $language = $c['language'];
+
                 // some debugger override logic
                 if ($page->debugger() === false) {
                     $c['debugger']->enabled(false);
                 }
 
-                if ($config->get('system.force_ssl')) {
-                    if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
-                        $url = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+                if ($c['config']->get('system.force_ssl')) {
+                    if (!isset($_SERVER['HTTPS']) || $_SERVER["HTTPS"] != "on") {
+                        $url = "https://" . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"];
                         $c->redirect($url);
                     }
                 }
 
-                $url = $pages->route($page->route());
+                $url = $page->route();
 
                 if ($uri->params()) {
-                    if ($url === '/') { //Avoid double slash
+                    if ($url == '/') { //Avoid double slash
                         $url = $uri->params();
                     } else {
                         $url .= $uri->params();
@@ -66,16 +67,18 @@ class PageServiceProvider implements ServiceProviderInterface
                     $url .= '#' . $uri->fragment();
                 }
 
-                /** @var Language $language */
-                $language = $c['language'];
-
                 // Language-specific redirection scenarios
-                if ($language->enabled() && ($language->isLanguageInUrl() xor $language->isIncludeDefaultLanguage())) {
-                    $c->redirect($url);
+                if ($language->enabled()) {
+                    if ($language->isLanguageInUrl() && !$language->isIncludeDefaultLanguage()) {
+                        $c->redirect($url);
+                    }
+                    if (!$language->isLanguageInUrl() && $language->isIncludeDefaultLanguage()) {
+                        $c->redirectLangSafe($url);
+                    }
                 }
                 // Default route test and redirect
-                if ($config->get('system.pages.redirect_default_route') && $page->route() !== $path) {
-                    $c->redirect($url);
+                if ($c['config']->get('system.pages.redirect_default_route') && $page->route() != $path) {
+                    $c->redirectLangSafe($url);
                 }
             }
 

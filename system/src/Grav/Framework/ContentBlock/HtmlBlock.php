@@ -15,7 +15,6 @@ namespace Grav\Framework\ContentBlock;
  */
 class HtmlBlock extends ContentBlock implements HtmlBlockInterface
 {
-    protected $version = 1;
     protected $frameworks = [];
     protected $styles = [];
     protected $scripts = [];

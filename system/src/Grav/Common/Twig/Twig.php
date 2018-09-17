@@ -113,10 +113,7 @@ class Twig
                 $params['cache'] = new \Twig_Cache_Filesystem($cachePath, \Twig_Cache_Filesystem::FORCE_BYTECODE_INVALIDATION);
             }
 
-            if (!$config->get('system.strict_mode.twig_compat', true)) {
-                // Force autoescape on for all files if in strict mode.
-                $params['autoescape'] = true;
-            } elseif (!empty($this->autoescape)) {
+            if (!empty($this->autoescape)) {
                 $params['autoescape'] = $this->autoescape;
             }
 
@@ -125,10 +122,10 @@ class Twig
             if ($config->get('system.twig.undefined_functions')) {
                 $this->twig->registerUndefinedFunctionCallback(function ($name) {
                     if (function_exists($name)) {
-                        return new \Twig_SimpleFunction($name, $name);
+                        return new \Twig_Function_Function($name);
                     }
 
-                    return new \Twig_SimpleFunction($name, function () {
+                    return new \Twig_Function_Function(function () {
                     });
                 });
             }
@@ -136,10 +133,10 @@ class Twig
             if ($config->get('system.twig.undefined_filters')) {
                 $this->twig->registerUndefinedFilterCallback(function ($name) {
                     if (function_exists($name)) {
-                        return new \Twig_SimpleFilter($name, $name);
+                        return new \Twig_Filter_Function($name);
                     }
 
-                    return new \Twig_SimpleFilter($name, function () {
+                    return new \Twig_Filter_Function(function () {
                     });
                 });
             }
@@ -148,7 +145,7 @@ class Twig
 
             // set default date format if set in config
             if ($config->get('system.pages.dateformat.long')) {
-                $this->twig->getExtension('Twig_Extension_Core')->setDateFormat($config->get('system.pages.dateformat.long'));
+                $this->twig->getExtension('core')->setDateFormat($config->get('system.pages.dateformat.long'));
             }
             // enable the debug extension if required
             if ($config->get('system.twig.debug')) {
@@ -162,7 +159,7 @@ class Twig
             $pages = $this->grav['pages'];
 
             // Set some standard variables for twig
-            $this->twig_vars += [
+            $this->twig_vars = $this->twig_vars + [
                     'config'            => $config,
                     'system'            => $config->get('system'),
                     'theme'             => $config->get('theme'),

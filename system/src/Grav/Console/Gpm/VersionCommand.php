@@ -11,9 +11,9 @@ namespace Grav\Console\Gpm;
 use Grav\Common\GPM\GPM;
 use Grav\Common\GPM\Upgrader;
 use Grav\Console\ConsoleCommand;
-use RocketTheme\Toolbox\File\YamlFile;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Yaml\Yaml;
 
 class VersionCommand extends ConsoleCommand
 {
@@ -84,10 +84,7 @@ class VersionCommand extends ConsoleCommand
                     }
                 }
 
-                $file = YamlFile::instance($blueprints_path);
-                $package_yaml = $file->content();
-                $file->free();
-
+                $package_yaml = Yaml::parse(file_get_contents($blueprints_path));
                 $version = $package_yaml['version'];
 
                 if (!$version) {

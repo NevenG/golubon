@@ -29,22 +29,21 @@ class SessionServiceProvider implements ServiceProviderInterface
             /** @var Uri $uri */
             $uri = $c['uri'];
 
-            // Get session options.
-            $enabled = (bool)$config->get('system.session.enabled', false);
-            $cookie_secure = (bool)$config->get('system.session.secure', false);
-            $cookie_httponly = (bool)$config->get('system.session.httponly', true);
-            $cookie_lifetime = (int)$config->get('system.session.timeout', 1800);
-            $cookie_path = $config->get('system.session.path');
-            if (null === $cookie_path) {
-                $cookie_path = '/' . trim(Uri::filterPath($uri->rootUrl(false)), '/');
+            // Get session parameters.
+            $session_timeout = (int)$config->get('system.session.timeout', 1800);
+            $session_path = $config->get('system.session.path');
+            if (null === $session_path) {
+                $session_path = '/' . ltrim(Uri::filterPath($uri->rootUrl(false)), '/');
             }
-            // Session cookie path requires trailing slash.
-            $cookie_path = rtrim($cookie_path, '/') . '/';
+            $domain = $uri->host();
+            if ($domain === 'localhost') {
+                $domain = '';
+            }
 
-            $cookie_domain = $uri->host();
-            if ($cookie_domain === 'localhost') {
-                $cookie_domain = '';
-            }
+            // Get session options.
+            $secure = (bool)$config->get('system.session.secure', false);
+            $httponly = (bool)$config->get('system.session.httponly', true);
+            $enabled = (bool)$config->get('system.session.enabled', false);
 
             // Activate admin if we're inside the admin path.
             $is_admin = false;
@@ -57,14 +56,14 @@ class SessionServiceProvider implements ServiceProviderInterface
                 // Check no language, simple language prefix (en) and region specific language prefix (en-US).
                 $pos = strpos($current_route, $base);
                 if ($pos === 0 || $pos === 3 || $pos === 6) {
-                    $cookie_lifetime = $config->get('plugins.admin.session.timeout', 1800);
+                    $session_timeout = $config->get('plugins.admin.session.timeout', 1800);
                     $enabled = $is_admin = true;
                 }
             }
 
             // Fix for HUGE session timeouts.
-            if ($cookie_lifetime > 99999999999) {
-                $cookie_lifetime = 9999999999;
+            if ($session_timeout > 99999999999) {
+                $session_timeout = 9999999999;
             }
 
             $inflector = new Inflector();
@@ -74,16 +73,10 @@ class SessionServiceProvider implements ServiceProviderInterface
             }
 
             // Define session service.
-            $options = [
-                'name' => $session_name,
-                'cookie_lifetime' => $cookie_lifetime,
-                'cookie_path' => $cookie_path,
-                'cookie_domain' => $cookie_domain,
-                'cookie_secure' => $cookie_secure,
-                'cookie_httponly' => $cookie_httponly
-            ] + (array) $config->get('system.session.options');
-
-            $session = new Session($options);
+            $session = new Session($session_timeout, $session_path, $domain);
+            $session->setName($session_name);
+            $session->setSecure($secure);
+            $session->setHttpOnly($httponly);
             $session->setAutoStart($enabled);
 
             return $session;

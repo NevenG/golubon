@@ -10,11 +10,9 @@ namespace Grav\Common\Page\Medium;
 
 use Grav\Common\Getters;
 use Grav\Common\Grav;
-use Grav\Common\Media\Interfaces\MediaCollectionInterface;
-use Grav\Common\Media\Interfaces\MediaObjectInterface;
 use Grav\Common\Utils;
 
-abstract class AbstractMedia extends Getters implements MediaCollectionInterface
+abstract class AbstractMedia extends Getters
 {
     protected $gettersVariable = 'instances';
 
@@ -23,7 +21,6 @@ abstract class AbstractMedia extends Getters implements MediaCollectionInterface
     protected $videos = [];
     protected $audios = [];
     protected $files = [];
-    protected $media_order;
 
     /**
      * Get medium by filename.
@@ -65,7 +62,7 @@ abstract class AbstractMedia extends Getters implements MediaCollectionInterface
     /**
      * Get a list of all media.
      *
-     * @return array|MediaObjectInterface[]
+     * @return array|Medium[]
      */
     public function all()
     {
@@ -77,7 +74,7 @@ abstract class AbstractMedia extends Getters implements MediaCollectionInterface
     /**
      * Get a list of all image media.
      *
-     * @return array|MediaObjectInterface[]
+     * @return array|Medium[]
      */
     public function images()
     {
@@ -88,7 +85,7 @@ abstract class AbstractMedia extends Getters implements MediaCollectionInterface
     /**
      * Get a list of all video media.
      *
-     * @return array|MediaObjectInterface[]
+     * @return array|Medium[]
      */
     public function videos()
     {
@@ -99,7 +96,7 @@ abstract class AbstractMedia extends Getters implements MediaCollectionInterface
     /**
      * Get a list of all audio media.
      *
-     * @return array|MediaObjectInterface[]
+     * @return array|Medium[]
      */
     public function audios()
     {
@@ -110,7 +107,7 @@ abstract class AbstractMedia extends Getters implements MediaCollectionInterface
     /**
      * Get a list of all file media.
      *
-     * @return array|MediaObjectInterface[]
+     * @return array|Medium[]
      */
     public function files()
     {
@@ -120,7 +117,7 @@ abstract class AbstractMedia extends Getters implements MediaCollectionInterface
 
     /**
      * @param string $name
-     * @param MediaObjectInterface $file
+     * @param Medium $file
      */
     protected function add($name, $file)
     {
@@ -148,20 +145,14 @@ abstract class AbstractMedia extends Getters implements MediaCollectionInterface
      */
     protected function orderMedia($media)
     {
-        if (null === $this->media_order) {
-            $page = Grav::instance()['pages']->get($this->path);
+        $page = Grav::instance()['pages']->get($this->path);
 
-            if ($page && isset($page->header()->media_order)) {
-                $this->media_order = array_map('trim', explode(',', $page->header()->media_order));
-            }
-        }
-
-        if (!empty($this->media_order) && is_array($this->media_order)) {
-            $media = Utils::sortArrayByArray($media, $this->media_order);
+        if ($page && isset($page->header()->media_order)) {
+            $media_order = array_map('trim', explode(',', $page->header()->media_order));
+            $media = Utils::sortArrayByArray($media, $media_order);
         } else {
             ksort($media, SORT_NATURAL | SORT_FLAG_CASE);
         }
-
         return $media;
     }
 

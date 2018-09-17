@@ -11,7 +11,6 @@ namespace Grav\Common\Page\Medium;
 use Grav\Common\Data\Blueprint;
 use Grav\Common\Grav;
 use Grav\Common\Utils;
-use RocketTheme\Toolbox\ResourceLocator\UniformResourceLocator;
 
 class ImageMedium extends Medium
 {
@@ -165,17 +164,11 @@ class ImageMedium extends Medium
      */
     public function url($reset = true)
     {
-        /** @var UniformResourceLocator $locator */
-        $locator = Grav::instance()['locator'];
-        $image_path = $locator->findResource('cache://images', true);
-        $image_dir = $locator->findResource('cache://images', false);
+        $image_path = Grav::instance()['locator']->findResource('cache://images', true);
+        $image_dir = Grav::instance()['locator']->findResource('cache://images', false);
         $saved_image_path = $this->saveImage();
 
         $output = preg_replace('|^' . preg_quote(GRAV_ROOT, '|') . '|', '', $saved_image_path);
-
-        if ($locator->isStream($output)) {
-            $output = $locator->findResource($output, false);
-        }
 
         if (Utils::startsWith($output, $image_path)) {
             $output = '/' . $image_dir . preg_replace('|^' . preg_quote($image_path, '|') . '|', '', $output);

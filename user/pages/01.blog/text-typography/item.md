@@ -1,10 +1,23 @@
 ---
-title: Typography
+title: Text & Typography
+date: 13:34 07/19/2017 
+
+hero_classes: text-light title-h1h2 overlay-dark hero-large parallax
+hero_image: unsplash-text.jpg
+show_sidebar: true
+
+taxonomy:
+    category: blog
+    tag: [journal]
 ---
 
-! Details on the full capabilities of Spectre.css can be found in the [Official Spectre Documentation](https://picturepan2.github.io/spectre/elements.html)
-
 The [Quark theme](https://github.com/getgrav/grav-theme-quark) is the new default theme for Grav built with [Spectre.css](https://picturepan2.github.io/spectre/) the lightweight, responsive and modern CSS framework. Spectre provides  basic styles for typography, elements, and a responsive layout system that utilizes best practices and consistent language design.
+
+===
+
+! Details on the full capabiltiies of Spectre.css can be found in the [Official Spectre Documentation](https://picturepan2.github.io/spectre/elements.html)
+
+
 
 ### Headings
 
@@ -152,4 +165,7 @@ The notices styles are actually provided by the `markdown-notices` plugin but ar
 
 !!!! This is a success notification
 ```
+
+
+
 

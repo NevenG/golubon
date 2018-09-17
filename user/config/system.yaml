@@ -1,12 +1,8 @@
-absolute_urls: false
-
 home:
-  alias: '/home'
+  alias: '/blog'
 
 pages:
   theme: quark
-  markdown:
-    extra: false
   process:
     markdown: true
     twig: false
@@ -31,15 +27,8 @@ assets:
   js_pipeline: false
   js_minify: true
 
-errors:
-  display: true
-  log: true
-
 debugger:
   enabled: false
   twig: true
   shutdown:
     close_connection: true
-gpm:
-  releases: stable
-  verify_peer: true
